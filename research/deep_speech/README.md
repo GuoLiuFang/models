@@ -59,7 +59,7 @@ To train and evaluate the model, issue the following command:
 python deep_speech.py
 ```
 Arguments:
-  * `--model_dir`: Directory to save model training checkpoints. By default, it is `/tmp/deep_speech_model/`.
+  * `--model_dir`: Directory to save model training checkpoints. By default, it is `/home/tensorflow/models/ModelsHub/Audio/deep_speech_model/`.
   * `--train_data_dir`: Directory of the training dataset.
   * `--eval_data_dir`: Directory of the evaluation dataset.
   * `--num_gpus`: Number of GPUs to use (specify -1 if you want to use all available GPUs).

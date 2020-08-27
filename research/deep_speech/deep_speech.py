@@ -323,7 +323,7 @@ def define_deep_speech_flags():
   flags.adopt_module_key_flags(flags_core)
 
   flags_core.set_defaults(
-      model_dir="/tmp/deep_speech_model/",
+      model_dir="/home/tensorflow/models/ModelsHub/Audio/deep_speech_model/",
       export_dir="/tmp/deep_speech_saved_model/",
       train_epochs=10,
       batch_size=128,
