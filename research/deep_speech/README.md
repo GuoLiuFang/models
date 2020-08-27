@@ -49,7 +49,7 @@ To download the dataset, issue the following command:
 python data/download.py
 ```
 Arguments:
-  * `--data_dir`: Directory where to download and save the preprocessed data. By default, it is `/tmp/librispeech_data`.
+  * `--data_dir`: Directory where to download and save the preprocessed data. By default, it is `/home/tensorflow/models/DataHub/Audio/librispeech_data`.
 
 Use the `--help` or `-h` flag to get a full list of possible arguments.
 
