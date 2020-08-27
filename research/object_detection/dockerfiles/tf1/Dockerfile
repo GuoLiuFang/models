@@ -3,7 +3,7 @@ FROM tensorflow/tensorflow:1.15.2-gpu-py3
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Install apt dependencies
-RUN apt-get update && apt-get install -y \
+RUN  echo "deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic main restricted universe multiverse" > /etc/apt/sources.list && echo "deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-updates main restricted universe multiverse" >> /etc/apt/sources.list && echo "deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-backports main restricted universe multiverse" >> /etc/apt/sources.list && echo "deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-security main restricted universe multiverse" >> /etc/apt/sources.list && apt-get update && apt-get install -y \
     git \
     gpg-agent \
     python3-cairocffi \
@@ -15,10 +15,10 @@ RUN apt-get update && apt-get install -y \
 
 # Install gcloud and gsutil commands
 # https://cloud.google.com/sdk/docs/quickstart-debian-ubuntu
-RUN export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
-    echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
-    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-    apt-get update -y && apt-get install google-cloud-sdk -y
+#RUN export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
+#    echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
+#    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
+#    apt-get update -y && apt-get install google-cloud-sdk -y
 
 # Add new user to avoid running as root
 RUN useradd -ms /bin/bash tensorflow
@@ -35,7 +35,7 @@ WORKDIR /home/tensorflow/models/research/
 RUN cp object_detection/packages/tf1/setup.py ./
 ENV PATH="/home/tensorflow/.local/bin:${PATH}"
 
-RUN python -m pip install --user -U pip
+RUN python -m pip install --user -U pip matplotlib -i https://mirrors.163.com/pypi/simple/
 RUN python -m pip install --user .
 
 ENV TF_CPP_MIN_LOG_LEVEL 3
