@@ -2,7 +2,7 @@
 # Script to run deep speech model to achieve the MLPerf target (WER = 0.23)
 # Step 1: download the LibriSpeech dataset.
 echo "Data downloading..."
-python data/download.py
+# python data/download.py
 
 ## After data downloading, the dataset directories are:
 train_clean_100="/home/tensorflow/models/DataHub/Audio/librispeech_data/train-clean-100/LibriSpeech/train-clean-100.csv"
@@ -43,7 +43,7 @@ echo "Model training and evaluation..."
 start=`date +%s`
 
 log_file=log_`date +%Y-%m-%d`
-nohup python deep_speech.py --train_data_dir=$final_train_file --eval_data_dir=$final_eval_file --num_gpus=-1 --wer_threshold=0.23 --seed=1 >$log_file 2>&1&
+nohup python deep_speech.py --train_data_dir=$final_train_file --eval_data_dir=$final_eval_file --num_gpus=2 --wer_threshold=0.23 --seed=1 >$log_file 2>&1&
 
 end=`date +%s`
 runtime=$((end-start))

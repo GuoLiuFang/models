@@ -123,7 +123,7 @@ def define_base(data_dir=True,
     flags.DEFINE_integer(
         name="num_gpus",
         short_name="ng",
-        default=1,
+        default=2,
         help=help_wrap("How many GPUs to use at each worker with the "
                        "DistributionStrategies API. The default is 1."))
 
