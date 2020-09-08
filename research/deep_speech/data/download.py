@@ -59,28 +59,31 @@ def download_and_extract(directory, url):
     url: the url to download the data file.
   """
 
+  tar_filepath = directory + ".tar.gz"
   if not tf.io.gfile.exists(directory):
     tf.io.gfile.makedirs(directory)
+    # _, tar_filepath = tempfile.mkstemp(suffix=".tar.gz")
 
-  _, tar_filepath = tempfile.mkstemp(suffix=".tar.gz")
+    try:
+      tf.compat.v1.logging.info("Downloading %s to %s" % (url, tar_filepath))
 
-  try:
-    tf.compat.v1.logging.info("Downloading %s to %s" % (url, tar_filepath))
+      # def _progress(count, block_size, total_size):
+      #   sys.stdout.write("\r>> Downloading {} {:.1f}%".format(
+      #       tar_filepath, 100.0 * count * block_size / total_size))
+      #   sys.stdout.flush()
 
-    def _progress(count, block_size, total_size):
-      sys.stdout.write("\r>> Downloading {} {:.1f}%".format(
-          tar_filepath, 100.0 * count * block_size / total_size))
-      sys.stdout.flush()
-
-    urllib.request.urlretrieve(url, tar_filepath, _progress)
-    print()
-    statinfo = os.stat(tar_filepath)
-    tf.compat.v1.logging.info(
-        "Successfully downloaded %s, size(bytes): %d" % (url, statinfo.st_size))
-    with tarfile.open(tar_filepath, "r") as tar:
-      tar.extractall(directory)
-  finally:
-    tf.io.gfile.remove(tar_filepath)
+      # urllib.request.urlretrieve(url, tar_filepath, _progress)
+      print()
+      statinfo = os.stat(tar_filepath)
+      tf.compat.v1.logging.info(
+          "Successfully downloaded %s, size(bytes): %d" % (url, statinfo.st_size))
+      with tarfile.open(tar_filepath, "r") as tar:
+        tar.extractall(directory)
+    finally:
+      tf.compat.v1.logging.info("%s is finally extracted" % (tar_filepath))
+      # tf.io.gfile.remove(tar_filepath)
+  else:
+    tf.compat.v1.logging.info("%s was finished download" % (tar_filepath))
 
 
 def convert_audio_and_split_transcript(input_dir, source_name, target_name,
@@ -166,9 +169,12 @@ def download_and_process_datasets(directory, datasets):
     tf.compat.v1.logging.info("Preparing dataset %s", dataset)
     dataset_dir = os.path.join(directory, dataset)
     download_and_extract(dataset_dir, LIBRI_SPEECH_URLS[dataset])
-    convert_audio_and_split_transcript(
-        dataset_dir + "/LibriSpeech", dataset, dataset + "-wav",
-        dataset_dir + "/LibriSpeech", dataset + ".csv")
+    if not tf.io.gfile.exists(os.path.join(dataset_dir + "/LibriSpeech", dataset + ".csv")):
+      convert_audio_and_split_transcript(
+          dataset_dir + "/LibriSpeech", dataset, dataset + "-wav",
+          dataset_dir + "/LibriSpeech", dataset + ".csv")
+    else:
+      continue
 
 
 def define_data_download_flags():
