@@ -26,7 +26,7 @@ import tensorflow as tf
 
 from official.modeling import hyperparams
 from official.modeling import tf_utils
-from official.nlp.modeling import layers
+from official.nlp import keras_nlp
 from official.nlp.modeling import networks
 
 
@@ -79,8 +79,6 @@ class MobileBertEncoderConfig(hyperparams.Config):
       MobileBERT paper. 'layer_norm' is used for the teacher model.
     classifier_activation: if using the tanh activation for the final
       representation of the [CLS] token in fine-tuning.
-    return_all_layers: if return all layer outputs.
-    return_attention_score: if return attention scores for each layer.
   """
   word_vocab_size: int = 30522
   word_embed_size: int = 128
@@ -99,8 +97,6 @@ class MobileBertEncoderConfig(hyperparams.Config):
   num_feedforward_networks: int = 1
   normalization_type: str = "layer_norm"
   classifier_activation: bool = True
-  return_all_layers: bool = False
-  return_attention_score: bool = False
 
 
 @dataclasses.dataclass
@@ -137,10 +133,11 @@ ENCODER_CLS = {
 
 
 @gin.configurable
-def build_encoder(config: EncoderConfig,
-                  embedding_layer: Optional[layers.OnDeviceEmbedding] = None,
-                  encoder_cls=None,
-                  bypass_config: bool = False):
+def build_encoder(
+    config: EncoderConfig,
+    embedding_layer: Optional[keras_nlp.layers.OnDeviceEmbedding] = None,
+    encoder_cls=None,
+    bypass_config: bool = False):
   """Instantiate a Transformer encoder network from EncoderConfig.
 
   Args:
@@ -188,7 +185,8 @@ def build_encoder(config: EncoderConfig,
         pooled_output_dim=encoder_cfg.hidden_size,
         pooler_layer_initializer=tf.keras.initializers.TruncatedNormal(
             stddev=encoder_cfg.initializer_range),
-        return_all_layer_outputs=encoder_cfg.return_all_encoder_outputs)
+        return_all_layer_outputs=encoder_cfg.return_all_encoder_outputs,
+        dict_outputs=True)
     return encoder_cls(**kwargs)
 
   if encoder_type == "mobilebert":
@@ -208,9 +206,7 @@ def build_encoder(config: EncoderConfig,
         key_query_shared_bottleneck=encoder_cfg.key_query_shared_bottleneck,
         num_feedforward_networks=encoder_cfg.num_feedforward_networks,
         normalization_type=encoder_cfg.normalization_type,
-        classifier_activation=encoder_cfg.classifier_activation,
-        return_all_layers=encoder_cfg.return_all_layers,
-        return_attention_score=encoder_cfg.return_attention_score)
+        classifier_activation=encoder_cfg.classifier_activation)
 
   if encoder_type == "albert":
     return encoder_cls(
@@ -226,7 +222,8 @@ def build_encoder(config: EncoderConfig,
         dropout_rate=encoder_cfg.dropout_rate,
         attention_dropout_rate=encoder_cfg.attention_dropout_rate,
         initializer=tf.keras.initializers.TruncatedNormal(
-            stddev=encoder_cfg.initializer_range))
+            stddev=encoder_cfg.initializer_range),
+        dict_outputs=True)
 
   # Uses the default BERTEncoder configuration schema to create the encoder.
   # If it does not match, please add a switch branch by the encoder type.
@@ -245,4 +242,5 @@ def build_encoder(config: EncoderConfig,
           stddev=encoder_cfg.initializer_range),
       embedding_width=encoder_cfg.embedding_size,
       embedding_layer=embedding_layer,
-      return_all_encoder_outputs=encoder_cfg.return_all_encoder_outputs)
+      return_all_encoder_outputs=encoder_cfg.return_all_encoder_outputs,
+      dict_outputs=True)
